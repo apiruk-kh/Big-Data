@@ -1,0 +1,220 @@
+Install Hadoop on Ubuntu 20.04
+Step 1) Create a hadoopuser:
+# Add user hadoopuser
+beer@beer01:~$ sudo adduser hadoopuser   
+# Change to hadoopuser
+beer@beer01:~$ sudo su - hadoopuser
+# Check current path
+hadoopuser@beer01:~$ pwd
+/home/hadoopuser
+    
+Step 2) Install JAVA:
+# Exit from current user
+hadoopuser@beer01:~$ exit
+# Change user to root
+beer@beer01:~$ sudo su - 
+# Add sudo permission to hadoopuser
+root@beer01:~# usermod -aG sudo hadoopuser 
+# Change to hadoopuser
+root@beer01:~# su - hadoopuser
+# Install JAVA
+hadoopuser@beer01:~$ sudo apt-get install openjdk-8-jdk
+# Check java version
+hadoopuser@beer01:~$ java -version
+
+Step 3) Install SSH & PDSH:
+hadoopuser@beer01:~$ sudo apt-get install ssh
+adoopuser@beer01:~$ sudo apt-get install pdsh
+
+Step 4) Download and install Hadoop:
+# Download package hadoop-3.3.4
+hadoopuser@beer01:~$ wget https://dlcdn.apache.org/hadoop/common/hadoop-3.3.4/hadoop-3.3.4.tar.gz
+hadoopuser@beer01:~$ ls
+hadoop-3.3.4.tar.gz
+# Extract file with tar commands
+hadoopuser@beer01:~$ tar -zxvf hadoop-3.3.4.tar.gz
+hadoopuser@beer01:~$ ls
+hadoop-3.3.4  hadoop-3.3.4.tar.gz
+# Change folder to hadoop
+hadoopuser@beer01:~$ mv hadoop-3.3.4 /home/hadoopuser/hadoop
+hadoopuser@beer01:~$ ls
+hadoop  hadoop-3.3.4.tar.gz
+
+4.1 Config core-site.xml
+hadoopuser@beer01:~$ cd ~/hadoop/etc/hadoop/
+hadoopuser@beer01:~/hadoop/etc/hadoop$ pwd
+/home/hadoopuser/hadoop/etc/hadoop
+hadoopuser@beer01:~/hadoop/etc/hadoop$ nano core-site.xml
+    <configuration>
+    <property>
+    <name>fs.defaultFS</name>
+    <value>hdfs://localhost:9000</value>
+    </property>
+    </configuration>
+
+4.2 Config hdfs-site.xml
+hadoopuser@beer01:~/hadoop/etc/hadoop$ nano hdfs-site.xml
+    <configuration>
+    <property>
+    <name>dfs.namenode.name.dir</name>
+    <value>/home/hadoopuser/hadoop/data/namenode</value>
+    </property>
+    <property>
+    <name>dfs.datanode.data.dir</name>
+    <value>/home/hadoopuser/hadoop/data/datanode</value>
+    </property>
+    <property>
+    <name>dfs.replication</name>
+    <value>1</value>
+    </property>
+    </configuration>
+
+4.3 Config mapred-site.xml
+hadoopuser@beer01:~/hadoop/etc/hadoop$ nano mapred-site.xml
+    <configuration>
+    <property>
+    <name>mapreduce.framework.name</name>
+    <value>yarn</value>
+    </property>
+    <property>
+    <name>mapreduce.application.classpath</name>
+    <value>$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/*:$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/lib/*</value>
+    </property>
+    </configuration>
+
+4.4 Config yarn-site.xml
+hadoopuser@beer01:~/hadoop/etc/hadoop$ nano yarn-site.xml 
+    <configuration>
+    <property>
+    <name>yarn.nodemanager.aux-services</name>
+    <value>mapreduce_shuffle</value>
+    </property>
+    <property>
+    <name>yarn.nodemanager.env-whitelist</name>
+    <value>JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_HOME,PATH,LANG,TZ,HADOOP_MAPRED_HOME</value>
+    </property>
+    </configuration>
+
+4.5 Config hadoop-env.sh
+hadoopuser@beer01:~/hadoop/etc/hadoop$ nano hadoop-env.sh
+    export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+
+Step 5) Configure SSH:
+hadoopuser@beer01:~/hadoop/etc/hadoop$ cd
+hadoopuser@beer01:~$ pwd
+/home/hadoopuser
+# Generate SSH keypair 
+hadoopuser@beer01:~$ ssh-keygen -t rsa -P ""
+# Add SSH keypair to authotized_keys file
+hadoopuser@beer01:~$ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+# Test remote login by SSH
+hadoopuser@beer01:~$ ssh localhost
+
+Step 6) Configure file /etc/environment & .bashrc:
+# Config grobal environments for JAVA
+hadoopuser@beer01:~$ sudo nano /etc/environment
+    PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
+    JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+    JRE_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre
+
+# Config current user environments for JAVA and Hadoop
+hadoopuser@beer01:~$ nano ~/.bashrc 
+    export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre
+    export HADOOP_HOME=/home/hadoopuser/hadoop
+    export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+    export HADOOP_COMMON_HOME=$HADOOP_HOME
+    export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native
+    export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+    export HADOOP_HDFS_HOME=$HADOOP_HOME
+    export HADOOP_INSTALL=$HADOOP_HOME
+    export HADOOP_LIBEXEC_DIR=$HADOOP_HOME/libexec
+    export HADOOP_MAPRED_HOME=$HADOOP_HOME
+    export HADOOP_OPTS="-Djava.library.path=$HADOOP_HOME/lib/native"
+    export HADOOP_YARN_HOME=$HADOOP_HOME
+    export YARN_HOME=$HADOOP_HOME
+    export JAVA_LIBRARY_PATH=$HADOOP_HOME/lib/native:$JAVA_LIBRARY_PATH
+    export LD_LIBRARY_PATH=$HADOOP_HOME/lib/native:$LD_LIBRARY_PATH
+    export PATH=$PATH:$HADOOP_HOME/bin
+    export PATH=$PATH:$HADOOP_HOME/sbin
+    pdsh -q -w localhost
+    export PDSH_RCMD_TYPE=ssh
+# Enforce profile
+hadoopuser@beer01:~$ source ~/.bashrc 
+
+Step 7) Configure owner and mode of the hadoop directory:
+# Change owner of folder 
+hadoopuser@beer01:~$ sudo chown hadoopuser:root -R /home/hadoopuser/hadoop
+# Change permission of folder
+hadoopuser@beer01:~$ sudo chmod g+rwx -R /home/hadoopuser/hadoop
+
+Step 8) Check hadoop version
+hadoopuser@beer01:~$ hadoop version
+
+Step 9) Format the filesystem
+# Create folder
+hadoopuser@beer01:~$ cd /home/hadoopuser/hadoop
+hadoopuser@beer01:~/hadoop$ mkdir data
+hadoopuser@beer01:~/hadoop$ mkdir data/namenode
+hadoopuser@beer01:~/hadoop$ mkdir data/datanode
+# Format filesystem 
+hadoopuser@beer01:~/hadoop$ hdfs namenode -format
+
+Step 10) Start NameNode daemon and DataNode daemon:
+# Start DFS
+hadoopuser@beer01:~/hadoop$ start-dfs.sh
+
+# Check process running
+hadoopuser@beer01:~/hadoop$ jps
+30114 DataNode
+30373 SecondaryNameNode
+29894 NameNode
+30607 Jps
+
+Step 11) Start ResourceManager daemon and NodeManager daemon:
+# Start YARN
+hadoopuser@beer01:~/hadoop$ start-yarn.sh 
+
+Step 12) Check jobs running and yarn node list
+# Check process running
+hadoopuser@beer01:~/hadoop$ jps
+30114 DataNode
+30373 SecondaryNameNode
+32549 NodeManager
+32165 ResourceManager
+29894 NameNode
+32970 Jps
+
+# Check node list
+hadoopuser@beer01:~/hadoop$ yarn node -list
+
+Step 13) Try some hdfs commands:
+# Download iris.data
+hadoopuser@beer01:~/hadoop$ wget https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data
+# Create folder on Hadoop
+hadoopuser@beer01:~/hadoop$ hdfs dfs -mkdir /hdfs_data
+# List folder on Hadoop
+hadoopuser@beer01:~/hadoop$ hdfs dfs -ls /
+Found 1 items
+drwxr-xr-x   - hadoopuser supergroup          0 2023-01-12 19:53 /hdfs_data
+hadoopuser@beer01:~/hadoop$ hdfs dfs -ls /hdfs_data/
+
+# Put file from local to Hadoop
+hadoopuser@beer01:~/hadoop$ hdfs dfs -put iris.data /hdfs_data/
+# List folder on Hadoop
+hadoopuser@beer01:~/hadoop$ hdfs dfs -ls /hdfs_data/
+Found 1 items
+-rw-r--r--   1 hadoopuser supergroup       4551 2023-01-12 19:55 /hdfs_data/iris.data
+
+# Get file from Hadoop to local
+hadoopuser@beer01:~/hadoop$ hdfs dfs -get /hdfs_data/iris.data downloaded_iris.csv
+hadoopuser@beer01:~/hadoop$ ls
+
+Step 14) Stop dfs and yarn
+hadoopuser@beer01:~/hadoop$ stop-yarn.sh
+Stopping nodemanagers
+Stopping resourcemanager
+hadoopuser@beer01:~/hadoop$ stop-dfs.sh
+Stopping namenodes on [localhost]
+Stopping datanodes
+Stopping secondary namenodes [beer01]
+hadoopuser@beer01:~/hadoop$ 

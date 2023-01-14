@@ -1,0 +1,48 @@
+# Download HIVE
+hadoopuser@beer01:~$ wget https://dlcdn.apache.org/hive/hive-3.1.2/apache-hive-3.1.2-bin.tar.gz
+
+# Extract file
+hadoopuser@beer01:~$ tar -zxvf apache-hive-3.1.2-bin.tar.gz
+
+# Move HIVE to /usr/local/hive 
+hadoopuser@beer01:~$ sudo mv apache-hive-3.1.2-bin /usr/local/hive
+
+# Adding Hive Environment Variables
+hadoopuser@beer01:~$ nano ~/.bashrc
+export HIVE_HOME=/usr/local/hive
+export PATH=$PATH:$HIVE_HOME/bin
+
+# Activate profile
+hadoopuser@beer01:~$ source ~/.bashrc
+
+# Create Hive directories within HDFS.
+# Start Hadoop
+hadoopuser@beer01:~$ start-dfs.sh
+hadoopuser@beer01:~$ start-yarn.sh
+hadoopuser@beer01:~$ jps
+
+hadoopuser@beer01:~$ hdfs dfs -mkdir /user
+hadoopuser@beer01:~$ hdfs dfs -mkdir /user/tmp
+
+# Adding Permissions
+hadoopuser@beer01:~$ hdfs dfs -chmod g+w /user/tmp
+hadoopuser@beer01:~$ hdfs dfs -chmod g+w /user/hive/warehouse
+
+# Configuring Hive
+hadoopuser@beer01:~$ cd /usr/local/hive/conf
+hadoopuser@beer01:/usr/local/hive/conf$ pwd
+/usr/local/hive/conf
+
+# Set HADOOP_HOME to point to a specific hadoop install directory
+HADOOP_HOME=/home/hadoopuser/hadoop/
+# Hive Configuration Directory can be controlled by:
+export HIVE_CONF_DIR=/usr/local/hive/conf/
+# Java Home
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+
+# Set HIVE environment
+hadoopuser@beer01:/usr/local/hive/conf$ sudo nano hive-env.sh
+HADOOP_HOME=/home/hadoopuser/hadoop/
+export HIVE_CONF_DIR=/usr/local/hive/conf/
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+
