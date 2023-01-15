@@ -88,33 +88,40 @@ hadoopuser@beer01:~/hadoop/etc/hadoop$ nano mapred-site.xml
 </property>
 </configuration>
 
-4.4 Config yarn-site.xml
+4.4) Config yarn-site.xml
 hadoopuser@beer01:~/hadoop/etc/hadoop$ nano yarn-site.xml 
-    <configuration>
-    <property>
-    <name>yarn.nodemanager.aux-services</name>
-    <value>mapreduce_shuffle</value>
-    </property>
-    <property>
-    <name>yarn.nodemanager.env-whitelist</name>
-    <value>JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_HOME,PATH,LANG,TZ,HADOOP_MAPRED_HOME</value>
-    </property>
-    </configuration>
+<configuration>
+<property>
+<name>yarn.nodemanager.aux-services</name>
+<value>mapreduce_shuffle</value>
+</property>
+<property>
+<name>yarn.nodemanager.env-whitelist</name>
+<value>JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_HOME,PATH,LANG,TZ,HADOOP_MAPRED_HOME</value>
+</property>
+</configuration>
 
-4.5 Config hadoop-env.sh
+4.5) Config hadoop-env.sh
 hadoopuser@beer01:~/hadoop/etc/hadoop$ nano hadoop-env.sh
-    export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
 
 Step 5) Configure SSH:
 hadoopuser@beer01:~/hadoop/etc/hadoop$ cd
 hadoopuser@beer01:~$ pwd
 /home/hadoopuser
+
 # Generate SSH keypair 
 hadoopuser@beer01:~$ ssh-keygen -t rsa -P ""
+
 # Add SSH keypair to authotized_keys file
 hadoopuser@beer01:~$ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+
 # Test remote login by SSH
 hadoopuser@beer01:~$ ssh localhost
+The authenticity of host 'localhost (127.0.0.1)' can't be established.
+ED25519 key fingerprint is SHA256:OtgTVtTW+lu+O7CLPxfBVZLaftfjaldqF1oalvaMK8U.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
 
 Step 6) Configure file /etc/environment & .bashrc:
 # Config grobal environments for JAVA
@@ -124,7 +131,8 @@ JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 JRE_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre
 
 # Config current user environments for JAVA and Hadoop
-hadoopuser@beer01:~$ nano ~/.bashrc 
+hadoopuser@beer01:~$ nano ~/.bashrc
+#JAVA
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre
 export HADOOP_HOME=/home/hadoopuser/hadoop
 export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
@@ -144,13 +152,13 @@ export PATH=$PATH:$HADOOP_HOME/bin
 export PATH=$PATH:$HADOOP_HOME/sbin
 pdsh -q -w localhost
 export PDSH_RCMD_TYPE=ssh
+
 # Enforce profile
 hadoopuser@beer01:~$ source ~/.bashrc 
 
 Step 7) Configure owner and mode of the hadoop directory:
-# Change owner of folder 
+# Change permission and owner of folder /home/hadoopuser/hadoop
 hadoopuser@beer01:~$ sudo chown hadoopuser:root -R /home/hadoopuser/hadoop
-# Change permission of folder
 hadoopuser@beer01:~$ sudo chmod g+rwx -R /home/hadoopuser/hadoop
 
 Step 8) Check hadoop version
@@ -162,6 +170,7 @@ hadoopuser@beer01:~$ cd /home/hadoopuser/hadoop
 hadoopuser@beer01:~/hadoop$ mkdir data
 hadoopuser@beer01:~/hadoop$ mkdir data/namenode
 hadoopuser@beer01:~/hadoop$ mkdir data/datanode
+
 # Format filesystem 
 hadoopuser@beer01:~/hadoop$ hdfs namenode -format
 
