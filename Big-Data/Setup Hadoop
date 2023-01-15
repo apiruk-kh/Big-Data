@@ -2,23 +2,27 @@ Install Hadoop on Ubuntu 20.04
 Step 1) Create a hadoopuser:
 # Add user hadoopuser
 beer@beer01:~$ sudo adduser hadoopuser   
+
 # Change to hadoopuser
 beer@beer01:~$ sudo su - hadoopuser
+
 # Check current path
 hadoopuser@beer01:~$ pwd
 /home/hadoopuser
-    
-Step 2) Install JAVA:
-# Exit from current user
-hadoopuser@beer01:~$ exit
+
 # Change user to root
 beer@beer01:~$ sudo su - 
+
 # Add sudo permission to hadoopuser
-root@beer01:~# usermod -aG sudo hadoopuser 
+root@beer01:~# usermod -aG sudo hadoopuser
+
 # Change to hadoopuser
 root@beer01:~# su - hadoopuser
+
+Step 2) Install JAVA:
 # Install JAVA
 hadoopuser@beer01:~$ sudo apt-get install openjdk-8-jdk
+
 # Check java version
 hadoopuser@beer01:~$ java -version
 
@@ -28,59 +32,61 @@ adoopuser@beer01:~$ sudo apt-get install pdsh
 
 Step 4) Download and install Hadoop:
 # Download package hadoop-3.3.4
-hadoopuser@beer01:~$ wget https://dlcdn.apache.org/hadoop/common/hadoop-3.3.4/hadoop-3.3.4.tar.gz
-hadoopuser@beer01:~$ ls
-hadoop-3.3.4.tar.gz
-# Extract file with tar commands
-hadoopuser@beer01:~$ tar -zxvf hadoop-3.3.4.tar.gz
-hadoopuser@beer01:~$ ls
-hadoop-3.3.4  hadoop-3.3.4.tar.gz
-# Change folder to hadoop
-hadoopuser@beer01:~$ mv hadoop-3.3.4 /home/hadoopuser/hadoop
-hadoopuser@beer01:~$ ls
-hadoop  hadoop-3.3.4.tar.gz
+hadoopuser@beer01:~$ cd /home/hadoopuser/Downloads
+hadoopuser@beer01:~/Downloads$ wget https://dlcdn.apache.org/hadoop/common/hadoop-3.3.4/hadoop-3.3.4.tar.gz
 
-4.1 Config core-site.xml
-hadoopuser@beer01:~$ cd ~/hadoop/etc/hadoop/
+# Extract file with tar commands
+hadoopuser@beer01:~/Downloads$ tar -zxvf hadoop-3.3.4.tar.gz
+hadoopuser@beer01:~/Downloads$ ls
+hadoop-3.3.4  hadoop-3.3.4.tar.gz
+
+# Change folder to hadoop
+hadoopuser@beer01:~/Downloads$ mv hadoop-3.3.4 /home/hadoopuser/hadoop
+hadoopuser@beer01:~/Downloads$ cd /home/hadoopuser/hadoop/
+hadoopuser@beer01:~/hadoop$ pwd
+/home/hadoopuser/hadoop
+
+4.1) Config core-site.xml
+hadoopuser@beer01:~/hadoop$ cd ~/hadoop/etc/hadoop/
 hadoopuser@beer01:~/hadoop/etc/hadoop$ pwd
 /home/hadoopuser/hadoop/etc/hadoop
 hadoopuser@beer01:~/hadoop/etc/hadoop$ nano core-site.xml
-    <configuration>
-    <property>
-    <name>fs.defaultFS</name>
-    <value>hdfs://localhost:9000</value>
-    </property>
-    </configuration>
+<configuration>
+<property>
+<name>fs.defaultFS</name>
+<value>hdfs://localhost:9000</value>
+</property>
+</configuration>
 
-4.2 Config hdfs-site.xml
+4.2) Config hdfs-site.xml
 hadoopuser@beer01:~/hadoop/etc/hadoop$ nano hdfs-site.xml
-    <configuration>
-    <property>
-    <name>dfs.namenode.name.dir</name>
-    <value>/home/hadoopuser/hadoop/data/namenode</value>
-    </property>
-    <property>
-    <name>dfs.datanode.data.dir</name>
-    <value>/home/hadoopuser/hadoop/data/datanode</value>
-    </property>
-    <property>
-    <name>dfs.replication</name>
-    <value>1</value>
-    </property>
-    </configuration>
+<configuration>
+<property>
+<name>dfs.namenode.name.dir</name>
+<value>/home/hadoopuser/hadoop/data/namenode</value>
+</property>
+<property>
+<name>dfs.datanode.data.dir</name>
+<value>/home/hadoopuser/hadoop/data/datanode</value>
+</property>
+<property>
+<name>dfs.replication</name>
+<value>1</value>
+</property>
+</configuration>
 
-4.3 Config mapred-site.xml
+4.3) Config mapred-site.xml
 hadoopuser@beer01:~/hadoop/etc/hadoop$ nano mapred-site.xml
-    <configuration>
-    <property>
-    <name>mapreduce.framework.name</name>
-    <value>yarn</value>
-    </property>
-    <property>
-    <name>mapreduce.application.classpath</name>
-    <value>$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/*:$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/lib/*</value>
-    </property>
-    </configuration>
+<configuration>
+<property>
+<name>mapreduce.framework.name</name>
+<value>yarn</value>
+</property>
+<property>
+<name>mapreduce.application.classpath</name>
+<value>$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/*:$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/lib/*</value>
+</property>
+</configuration>
 
 4.4 Config yarn-site.xml
 hadoopuser@beer01:~/hadoop/etc/hadoop$ nano yarn-site.xml 
