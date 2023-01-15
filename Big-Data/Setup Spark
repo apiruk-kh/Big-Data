@@ -1,18 +1,17 @@
 # Download Spark
-hadoopuser@beer01:~$ wget https://dlcdn.apache.org/spark/spark-3.2.3/spark-3.2.3-bin-hadoop3.2-scala2.13.tgz
+hadoopuser@beer01:~$ cd /home/hadoopuser/Downloads/
+hadoopuser@beer01:~/Downloads$ wget https://dlcdn.apache.org/spark/spark-3.3.1/spark-3.3.1-bin-hadoop3-scala2.13.tgz
 
 # Extract file
-hadoopuser@beer01:~$ tar -zxvf spark-3.2.3-bin-hadoop3.2-scala2.13.tgz
-
-# Check current path
-hadoopuser@beer01:~$ pwd
-/home/hadoopuser
+hadoopuser@beer01:~/Downloads$ tar -zxvf spark-3.3.1-bin-hadoop3-scala2.13.tgz
 
 # Move folder to /usr/local/spark
-hadoopuser@beer01:~$ sudo mv spark-3.2.3-bin-hadoop3.2-scala2.13 /usr/local/spark
+hadoopuser@beer01:~/Downloads$ sudo mv spark-3.3.1-bin-hadoop3-scala2.13 /usr/local/spark
+hadoopuser@beer01:~/Downloads$ cd
 
 # Edit Spark Settings in the file ~/.bashrc
 hadoopuser@beer01:~$ nano ~/.bashrc
+#SPARK
 export SPARK_HOME=/usr/local/spark/
 export PYTHONPATH=$SPARK_HOME/python:$PYTHONPATH
 export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
@@ -27,8 +26,25 @@ hadoopuser@beer01:~$ source ~/.bashrc
 # Set an environment to work with python project
 # Install python3.10-venv
 hadoopuser@beer01:~$ sudo apt-get -y install python3.10-venv
-hadoopuser@beer01:~$ sudo apt install python4-pip
-hadoopuser@beer01:~/bigdata$ pip install jupyter
+
+# Create folder bigdata
+hadoopuser@beer01:~$ mkdir bigdata
+hadoopuser@beer01:~$ cd bigdata
+
+# Create env_data
+hadoopuser@beer01:~/bigdata$ python3 -m venv env_data
+hadoopuser@beer01:~/bigdata$ ls
+env_data
+
+# Activate env_data environment
 hadoopuser@beer01:~/bigdata$ source env_data/bin/activate
+
+# Update pip
 (env_data) hadoopuser@beer01:~/bigdata$ pip install --upgrade pip
+
+# Install jupyter
+(env_data) hadoopuser@beer01:~/bigdata$ pip install jupyter
+(env_data) hadoopuser@beer01:~/bigdata$ python -m ipykernel install --user --name=env_bigdata
+
+# Run Spark
 (env_data) hadoopuser@beer01:~/bigdata$ pyspark
