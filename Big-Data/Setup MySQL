@@ -1,7 +1,7 @@
-# Update OS
+# Update Repositories
 hadoopuser@beer01:~/hadoop$ sudo apt update
 
-# Install MySQL
+# Install MySQL Server
 hadoopuser@beer01:~/hadoop$ sudo apt install mysql-server
 
 # Start MySQL service
@@ -14,43 +14,45 @@ hadoopuser@beer01:~/hadoop$ sudo mysql
 
 # Change MySQL root password
 mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'P@ssw0rd';
-Query OK, 0 rows affected (0.03 sec)
 
-mysql> exit
+mysql> exit;
 
 # Test login MySQL with newpassword of root
 hadoopuser@beer01:~/hadoop$ mysql -u root -p 
 
 # Connect to MySQL as your root user using the sudo mysql command.
 mysql> ALTER USER 'root'@'localhost' IDENTIFIED WITH auth_socket;
-Query OK, 0 rows affected (0.03 sec)
 
 # Create hadoopuser on MySQL
 mysql> CREATE USER 'hadoopuser'@'localhost' IDENTIFIED BY 'P@ssw0rd';
-Query OK, 0 rows affected (0.02 sec)
 
 # Allow privileges to all databases & tables for hadoopuser
 mysql> GRANT ALL PRIVILEGES ON *.* TO 'hadoopuser'@'localhost';
-Query OK, 0 rows affected (0.02 sec)
 
 # Flush privileges
 mysql> FLUSH PRIVILEGES;
-Query OK, 0 rows affected (0.01 sec)
 
 # Exit MySQL
-mysql> exit
+mysql> exit;
 
 # Test loing to MySQL with hadoopuser
 hadoopuser@beer01:~/hadoop$ mysql -u hadoopuser -p
 
+# Exit MySQL
+mysql> exit;
+
 # Download test DB from Github
 https://github.com/datacharmer/test_db
 
+hadoopuser@beer01:~/hadoop$ cd /home/hadoopuser/Downloads/
+
 # Extract file
-hadoopuser@beer01:~$ unzip test_db-master.zip 
+hadoopuser@beer01:~/Downloads$ unzip test_db-master.zip
+hadoopuser@beer01:~/Downloads$ cd test_db-master/
 
 # Import database to MySQL
-hadoopuser@beer01:~/test_db-master$ mysql -u hadoopuser -p < employees.sql 
+hadoopuser@beer01:~/Downloads/test_db-master$ mysql -u hadoopuser -p < employees.sql
+hadoopuser@beer01:~/Downloads/test_db-master$ mysql -u hadoopuser -p
 
 mysql> show databases;
 +--------------------+
@@ -96,4 +98,4 @@ mysql> select * from current_dept_emp limit 5;
 +--------+---------+------------+------------+
 5 rows in set (0.18 sec)
 
-mysql> 
+mysql> exit;
