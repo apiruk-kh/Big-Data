@@ -107,7 +107,48 @@ hadoopuser@beer01:~/Downloads$ wget https://downloads.apache.org//commons/lang/b
 hadoopuser@beer01:~/Downloads$ tar -zxvf commons-lang-2.6-bin.tar.gz
 hadoopuser@beer01:~/Downloads$ cd commons-lang-2.6/
 hadoopuser@beer01:~/Downloads/commons-lang-2.6$ sudo cp commons-lang-2.6.jar /home/hadoopuser/sqoop/lib/
+hadoopuser@beer01:~/Downloads/commons-lang-2.6$ cd ..
+hadoopuser@beer01:~/Downloads$ wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.30/mysql-connector-java-8.0.30.jar
+hadoopuser@beer01:~/Downloads$ sudo cp mysql-connector-java-8.0.30.jar /home/hadoopuser/sqoop/lib/
+hadoopuser@beer01:~/Downloads$ cd
+hadoopuser@beer01:~$ sudo chown -R hadoopuser:hadoopuser /home/hadoopuser/sqoop/lib/*
 
+hadoopuser@beer01:~$ start-dfs.sh
+Starting namenodes on [localhost]
+Starting datanodes
+Starting secondary namenodes [beer01]
 
+hadoopuser@beer01:~$ start-yarn.sh
+Starting resourcemanager
+Starting nodemanagers
 
+hadoopuser@beer01:~$ jps
+17152 DataNode
+16992 NameNode
+17346 SecondaryNameNode
+17845 NodeManager
+18005 Jps
+17532 ResourceManager
 
+hadoopuser@beer01:~$ sqoop import --connect jdbc:mysql://localhost/hadoop_test --username 'sqoopuser' --password 'P@ssw0rd' --table user -m 1
+
+hadoopuser@beer01:~$ hdfs dfs -ls
+Found 1 items
+drwxr-xr-x   - hadoopuser supergroup          0 2023-01-16 00:28 user
+hadoopuser@beer01:~$ hdfs dfs -ls user
+Found 2 items
+-rw-r--r--   1 hadoopuser supergroup          0 2023-01-16 00:28 user/_SUCCESS
+-rw-r--r--   1 hadoopuser supergroup         75 2023-01-16 00:28 user/part-m-00000
+hadoopuser@beer01:~$ hdfs dfs -ls user/*
+-rw-r--r--   1 hadoopuser supergroup          0 2023-01-16 00:28 user/_SUCCESS
+-rw-r--r--   1 hadoopuser supergroup         75 2023-01-16 00:28 user/part-m-00000
+hadoopuser@beer01:~$ hdfs dfs -cat user/*
+sqoopuser
+hiveuser
+hadoopuser
+piguser
+mysqluser
+mongodbuser
+hbaseuser
+root
+hadoopuser@beer01:~$ 
