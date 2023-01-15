@@ -205,16 +205,20 @@ hadoopuser@beer01:~/hadoop$ yarn node -list
 Step 13) Try some hdfs commands:
 # Download iris.data
 hadoopuser@beer01:~/hadoop$ wget https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data
+
 # Create folder on Hadoop
 hadoopuser@beer01:~/hadoop$ hdfs dfs -mkdir /hdfs_data
+
 # List folder on Hadoop
 hadoopuser@beer01:~/hadoop$ hdfs dfs -ls /
 Found 1 items
 drwxr-xr-x   - hadoopuser supergroup          0 2023-01-12 19:53 /hdfs_data
+
 hadoopuser@beer01:~/hadoop$ hdfs dfs -ls /hdfs_data/
 
 # Put file from local to Hadoop
 hadoopuser@beer01:~/hadoop$ hdfs dfs -put iris.data /hdfs_data/
+
 # List folder on Hadoop
 hadoopuser@beer01:~/hadoop$ hdfs dfs -ls /hdfs_data/
 Found 1 items
@@ -228,6 +232,7 @@ Step 14) Stop dfs and yarn
 hadoopuser@beer01:~/hadoop$ stop-yarn.sh
 Stopping nodemanagers
 Stopping resourcemanager
+
 hadoopuser@beer01:~/hadoop$ stop-dfs.sh
 Stopping namenodes on [localhost]
 Stopping datanodes
