@@ -118,7 +118,7 @@ hadoopuser@beer01:~/Downloads$ sudo nano /usr/local/hive/conf/hive-site.xml
 # Start hive
 hadoopuser@beer01:~$ hive
 
-# Fix error
+# Fix error https://issues.apache.org/jira/browse/HIVE-22915
 hadoopuser@beer01:~$ rm /usr/local/hive/lib/guava-19.0.jar 
 hadoopuser@beer01:~$ cp /home/hadoopuser/hadoop/share/hadoop/hdfs/lib/guava-27.0-jre.jar /usr/local/hive/lib/
 hadoopuser@beer01:~$ hive
