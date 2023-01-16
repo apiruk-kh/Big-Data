@@ -1,0 +1,146 @@
+# Download HIVE
+hadoopuser@beer01:~$ cd /home/hadoopuser/Downloads/
+hadoopuser@beer01:~/Downloads$ wget https://dlcdn.apache.org/hive/hive-3.1.2/apache-hive-3.1.2-bin.tar.gz
+
+# Extract file
+hadoopuser@beer01:~/Downloads$ tar -zxvf apache-hive-3.1.2-bin.tar.gz
+
+# Move HIVE to /usr/local/hive 
+hadoopuser@beer01:~/Downloads$ sudo mv apache-hive-3.1.2-bin /usr/local/hive
+hadoopuser@beer01:~/Downloads$ cd
+
+# Adding Hive Environment Variables
+hadoopuser@beer01:~$ nano ~/.bashrc
+#HIVE
+export HIVE_HOME=/usr/local/hive
+export PATH=$PATH:$HIVE_HOME/bin
+
+# Activate profile
+hadoopuser@beer01:~$ source ~/.bashrc
+
+# Create Hive directories within HDFS.
+# Start Hadoop
+hadoopuser@beer01:~$ start-dfs.sh
+Starting namenodes on [localhost]
+Starting datanodes
+Starting secondary namenodes [beer01]
+
+hadoopuser@beer01:~$ start-yarn.sh
+Starting resourcemanager
+Starting nodemanagers
+
+hadoopuser@beer01:~$ jps
+12240 DataNode
+12436 SecondaryNameNode
+12932 NodeManager
+12085 NameNode
+13093 Jps
+12620 ResourceManager
+
+hadoopuser@beer01:~$ hdfs dfs -mkdir /user
+hadoopuser@beer01:~$ hdfs dfs -mkdir /user/tmp
+hadoopuser@beer01:~$ hdfs dfs -mkdir -p /user/hive/warehouse
+
+# Adding Permissions
+hadoopuser@beer01:~$ hdfs dfs -chmod g+w /user/tmp
+hadoopuser@beer01:~$ hdfs dfs -chmod g+w /user/hive/warehouse
+
+# Configuring Hive
+hadoopuser@beer01:~$ cd /usr/local/hive/conf
+hadoopuser@beer01:/usr/local/hive/conf$ pwd
+/usr/local/hive/conf
+
+# Set HIVE environment
+hadoopuser@beer01:/usr/local/hive/conf$ sudo nano hive-env.sh
+# Set HADOOP_HOME to point to a specific hadoop install directory
+HADOOP_HOME=/home/hadoopuser/hadoop/
+# Hive Configuration Directory can be controlled by:
+export HIVE_CONF_DIR=/usr/local/hive/conf/
+# Java Home
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+
+# Change owner of hive-env.sh
+hadoopuser@beer01:/usr/local/hive/conf$ sudo chown hadoopuser:hadoopuser hive-env.sh
+
+# Download mysql-connector-j_8.0.31-1ubuntu22.04_all.deb from https://dev.mysql.com/downloads/connector/j/
+hadoopuser@beer01:/usr/local/hive/conf$ cd ~/Downloads/
+
+# Setup mysql-connector
+hadoopuser@beer01:~/Downloads$ sudo dpkg -i mysql-connector-j_8.0.31-1ubuntu22.04_all.deb
+
+# Check mysql-connector.jar is installed.
+hadoopuser@beer01:~/Downloads$ ls -l /usr/share/java/mysql-connector*.jar
+
+# Create soft-link mysql-connector for HIVE
+hadoopuser@beer01:~/Downloads$ sudo ln -s /usr/share/java/mysql-connector-j-8.0.31.jar $HIVE_HOME/lib/mysql-connector-java.jar
+hadoopuser@beer01:~/Downloads$ sudo chown hadoopuser:hadoopuser $HIVE_HOME/lib/mysql-connector-java.jar
+
+# Create the Initial database schema using the hive-schema-3.1.0.mysql.sql file
+hadoopuser@beer01:~/Downloads$ sudo mysql -u root -p
+mysql> CREATE DATABASE metastore;
+mysql> USE metastore;
+mysql> SOURCE /usr/local/hive/scripts/metastore/upgrade/mysql/hive-schema-3.1.0.mysql.sql;
+
+# For Hive to access the metastore a MySQL user hive account needs to be created. It
+mysql> CREATE USER 'hive'@'localhost' IDENTIFIED BY 'P@ssw0rd';
+mysql> GRANT ALL PRIVILEGES ON *.* TO 'hive'@'localhost';
+mysql> FLUSH PRIVILEGES;
+
+# Test login MySQL with hive user
+hadoopuser@beer01:~/Downloads$ mysql -u hive -pP@ssw0rd
+mysql> exit;
+
+# Create environment for hive-site.xml
+hadoopuser@beer01:~/Downloads$ sudo nano /usr/local/hive/conf/hive-site.xml
+<configuration>
+<property>
+<name>javax.jdo.option.ConnectionURL</name>
+<value>jdbc:mysql://localhost/metastore?createDatabaseIfNotExist=true</value>
+<description>metadata is stored in a MySQL server</description>
+</property>
+<property>
+<name>javax.jdo.option.ConnectionDriverName</name>
+<value>com.mysql.cj.jdbc.Driver</value>
+<description>MySQL JDBC driver class</description>
+</property>
+<property>
+<name>javax.jdo.option.ConnectionUserName</name>
+<value>hive</value>
+<description>user name for connecting to mysql server</description>
+</property>
+<property>
+<name>javax.jdo.option.ConnectionPassword</name>
+<value>Hivep@ssw0rd</value>
+<description>hivepassword for connecting to mysql server</description>
+</property>
+</configuration>
+
+# Start hive
+hadoopuser@beer01:~$ hive
+
+# Fix error https://issues.apache.org/jira/browse/HIVE-22915
+hadoopuser@beer01:~$ rm /usr/local/hive/lib/guava-19.0.jar 
+hadoopuser@beer01:~$ cp /home/hadoopuser/hadoop/share/hadoop/hdfs/lib/guava-27.0-jre.jar /usr/local/hive/lib/
+hadoopuser@beer01:~$ hive
+
+# Creat table
+hive> create table test(id int,name string);
+hive> exit;
+
+# Login MySQL with hive user
+hadoopuser@beer01:~$ mysql -u hive -pP@ssw0rd
+
+mysql> use metastore;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> select OWNER,TBL_NAME from TBLS;
++------------+----------+
+| OWNER      | TBL_NAME |
++------------+----------+
+| hadoopuser | test     |
++------------+----------+
+1 row in set (0.00 sec)
+
+mysql> 
