@@ -110,7 +110,7 @@ hadoopuser@beer01:~/Downloads$ sudo nano /usr/local/hive/conf/hive-site.xml
 </property>
 <property>
 <name>javax.jdo.option.ConnectionPassword</name>
-<value>Hivep@ssw0rd</value>
+<value>P@ssw0rd</value>
 <description>hivepassword for connecting to mysql server</description>
 </property>
 </configuration>
